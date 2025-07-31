@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS staging.stg_sales (
     date_sold DATE,
     discount NUMERIC(5, 2),
     quantity INTEGER,
-    source_store TEXT, -- from file name or manual tagging
     loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

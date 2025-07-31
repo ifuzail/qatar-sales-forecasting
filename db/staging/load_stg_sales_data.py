@@ -45,6 +45,7 @@ def load_sales_data():
             df['store_name'] = store['store_name']
             df['region'] = store['region']
 
+
             combined_df = pd.concat([combined_df, df], ignore_index=True)
             print(f"✅ Loaded {store['filename']}")
         except FileNotFoundError:
