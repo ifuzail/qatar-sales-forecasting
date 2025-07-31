@@ -1,3 +1,14 @@
+/* 
+
+Diclaimer: re-running this query will result in deletion of existing data in the table.
+
+
+*/
+
+
+
+
+
 -- core.fact_sales
 CREATE TABLE IF NOT EXISTS core.fact_sales (
     sales_id SERIAL PRIMARY KEY,

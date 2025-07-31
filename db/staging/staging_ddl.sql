@@ -1,4 +1,11 @@
--- staging.stg_sales
+/* 
+
+Diclaimer: re-running this query will result in deletion of existing data in the table.
+
+
+*/
+
+
 CREATE TABLE IF NOT EXISTS staging.stg_sales (
     product_name TEXT,
     category TEXT,
@@ -9,3 +16,5 @@ CREATE TABLE IF NOT EXISTS staging.stg_sales (
     source_store TEXT, -- from file name or manual tagging
     loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
