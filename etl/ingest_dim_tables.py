@@ -42,11 +42,10 @@ def load_dim_date(df, engine):
     dim_date['year'] = dim_date['date_sold'].dt.year
     dim_date['quarter'] = dim_date['date_sold'].dt.quarter
     dim_date['weekday'] = dim_date['date_sold'].dt.day_name()
-    dim_date = dim_date.rename(columns={'date_sold': 'date'})
 
     # Filter out existing dates
-    existing = pd.read_sql("SELECT date FROM core.dim_date", engine)
-    dim_date = dim_date[~dim_date['date'].isin(existing['date'])]
+    existing = pd.read_sql("SELECT date_sold FROM core.dim_date", engine)
+    dim_date = dim_date[~dim_date['date_sold'].isin(existing['date_sold'])]
 
     if not dim_date.empty:
         dim_date.to_sql('dim_date', engine, schema='core', index=False, if_exists='append', method='multi')

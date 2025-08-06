@@ -1,25 +1,23 @@
 import sys
 import os
 import pandas as pd
+from sqlalchemy import text  
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from db.db_config import get_engine
 
 def transform_and_load_sales():
     try:
-        #step1: connect using sqlalchemy
         engine = get_engine()
-        conn = engine.connect()
 
-        #step2: Read staging data into DataFrame
-        df = pd.read_sql("SELECT * FROM staging.stg_sales;", conn)
+        with engine.connect() as conn:
+            df = pd.read_sql("SELECT * FROM staging.stg_sales;", conn)
 
         if df.empty:
             print("[!] No data in staging table.")
             return
-        
-        #step 3: Clean and transform
+
+        # Clean and transform
         df = df.dropna(subset=["product_name", "date_sold", "quantity", "price"])
 
         df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
@@ -32,14 +30,19 @@ def transform_and_load_sales():
         df["product_name"] = df["product_name"].str.strip()
         df["category"] = df["category"].str.strip()
 
-        #step 4: Load into final sales table
-        df.to_sql("stg_sales_cleaned" , engine , schema='staging' , index=False , if_exists="append", method="multi")
+        # ✅ Drop duplicates based on important columns
+        df = df.drop_duplicates(subset=["product_name", "date_sold", "quantity", "price"])
 
-        print(f"[✓] Loaded {len(df)} records into final 'sales' table.")
+        # ✅ Wrap SQL with text()
+        with engine.begin() as conn:
+            conn.execute(text("DELETE FROM staging.stg_sales_cleaned;"))
+
+        df.to_sql("stg_sales_cleaned", engine, schema='staging', index=False, if_exists="append", method="multi")
+
+        print(f"[✓] Loaded {len(df)} records into 'staging.stg_sales_cleaned'.")
+
     except Exception as e:
         print(f"[ERROR] ETL failed: {e}")
-    finally:
-        conn.close()
 
 if __name__ == "__main__":
     transform_and_load_sales()
